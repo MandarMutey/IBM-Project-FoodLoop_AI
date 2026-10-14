@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoodLoop AI Demo - Mandar Mutey</title>
+<style>
+:root{--bg:#f6f8f4;--card:#fff;--ink:#16211c;--mute:#5d6b63;--line:#dfe6df;--g:#14532d;--gl:#e6f1e8;--y:#f2b705;--yl:#fdf3cf;--yd:#7a5c00;--r:#b3261e;--rl:#fbe4e2;--c1:#14532d;--c2:#4c9a6a;--c3:#f2b705;--c4:#aac3b1}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#17231d;--ink:#e8efe9;--mute:#9fb0a5;--line:#2a3a31;--g:#7fd49b;--gl:#1d3327;--y:#f2b705;--yl:#3a3210;--yd:#f2d36b;--r:#ff8a80;--rl:#3b1d1b;--c1:#7fd49b;--c2:#4c9a6a;--c3:#f2b705;--c4:#5c7766}}
+*{box-sizing:border-box}html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Segoe UI","Trebuchet MS",system-ui,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.15;margin:0 0 .4em}
+h1{font-size:clamp(2.1rem,6vw,3.6rem)}h2{font-size:1.7rem}h3{font-size:1.1rem}
+p{margin:0 0 .8em;color:var(--mute)}
+.w{max-width:1200px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+header .w{display:flex;align-items:center;justify-content:space-between;height:60px;flex-wrap:wrap;gap:8px}
+.logo{font:700 1.25rem Georgia,serif;color:var(--ink);text-decoration:none}.logo b{color:var(--g)}
+nav a{color:var(--mute);text-decoration:none;padding:6px 12px;border-radius:8px;margin-left:2px}
+nav a.on{background:var(--gl);color:var(--g);font-weight:700}
+section{display:none;padding:34px 0 50px}section.on{display:block}
+.sec{margin-top:40px}
+.hero{background:var(--g);color:#fff;border-radius:18px;padding:44px 38px;display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:center}
+@media(prefers-color-scheme:dark){.hero{background:#173d28}}
+.hero p{color:#d5e8da}.hero h1{margin-bottom:.3em}
+.btn{display:inline-block;border:1.5px solid var(--g);background:var(--g);color:#fff;padding:9px 16px;border-radius:9px;font:700 .95rem inherit;cursor:pointer;text-decoration:none}
+.btn.o{background:transparent;color:var(--g)}.btn.s{padding:6px 12px;font-size:.86rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.hero .btn{background:var(--y);border-color:var(--y);color:#16211c}.hero .btn.o{background:transparent;color:#fff;border-color:#fff}
+@media(prefers-color-scheme:dark){.btn{color:#0f1713}.btn.o{color:var(--g)}}
+.clock{background:rgba(255,255,255,.1);border-radius:14px;padding:20px}
+.clock .big{font:700 2.6rem Georgia,serif;color:var(--y)}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+.clock .bar{background:rgba(255,255,255,.2)}.clock .bar i{background:var(--y)}
+.clock .marks{display:flex;justify-content:space-between;font-size:.78rem;color:#d5e8da;margin-top:6px}
+.grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:900px){.hero,.g3,.g4,.g2,.g5{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card.step{border-left:5px solid var(--g)}.card.warn{border-left:5px solid var(--y)}.card.bad{border-left:5px solid var(--r)}
+.k{font:700 1.7rem Georgia,serif;color:var(--g)}.small{font-size:.86rem;color:var(--mute)}
+.card p:last-child{margin-bottom:0}
+.card ul.plain{margin:6px 0 0;padding-left:18px;color:var(--mute);font-size:.92rem}
+.card ul.plain li{margin-bottom:3px}
+.stats .card{text-align:left}.stats .k{font-size:1.9rem}
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:s}
+.flow li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative}
+.flow li::before{content:counter(s);display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;margin-bottom:8px}
+@media(prefers-color-scheme:dark){.flow li::before{color:#0f1713}}
+.flow h3{font-size:1rem}.flow p{font-size:.9rem}.flow .t{display:block;font-size:.8rem;color:var(--yd);font-weight:700}
+@media(max-width:900px){.flow{grid-template-columns:1fr}}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700}details p{margin:8px 0 0}
+.cta{background:var(--gl);border:1px solid var(--line);border-radius:14px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.cta h3{margin:0 0 .2em;font-size:1.3rem}.cta p{margin:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+.tabs button.on{background:var(--g);color:#fff;border-color:var(--g)}
+@media(prefers-color-scheme:dark){.tabs button.on{color:#0f1713}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}}
+aside{position:sticky;top:76px}
+@media(max-width:1000px){aside{position:static}}
+.log{list-style:none;margin:8px 0 0;padding:0;font-size:.84rem}
+.log li{padding:6px 0;border-top:1px solid var(--line);color:var(--ink)}
+.log li:first-child{border-top:0}
+.log .tm{color:var(--mute);font-size:.78rem;display:block}
+label{display:block;font-weight:700;font-size:.88rem;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:84px}
+input[type=range]{padding:0;accent-color:var(--g)}
+.tag{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:999px;background:var(--gl);color:var(--g);margin:0 4px 4px 0;font-weight:700}
+.tag.y{background:var(--yl);color:var(--yd)}.tag.r{background:var(--rl);color:var(--r)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.ngo{padding:12px 0;border-top:1px solid var(--line)}.ngo:first-of-type{border-top:0}
+.sc{font:700 1.4rem Georgia,serif;color:var(--g)}
+.stack{display:flex;height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:6px 0}.stack i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--mute);margin:2px 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.chat{max-width:360px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.chat .h{background:var(--g);color:#fff;padding:9px 14px;font-weight:700}
+@media(prefers-color-scheme:dark){.chat .h{color:#0f1713}}
+.chat .b{background:var(--gl);padding:12px;display:grid;gap:8px}
+.m{background:var(--card);padding:8px 11px;border-radius:10px;font-size:.9rem;max-width:90%;white-space:pre-wrap}.m.me{background:var(--y);color:#16211c;justify-self:end}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--mute);font-weight:700}
+.fields{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.fields{grid-template-columns:1fr 1fr}}
+.fields label{margin-top:0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}}
+.kpis .card{padding:12px 16px}
+.seg{display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--line);margin:8px 0 6px}.seg i{display:block;height:100%}
+.lc{display:grid;grid-template-columns:repeat(5,1fr);border:2px solid var(--ink);font-size:.84rem;background:var(--card)}
+.lc>div{padding:10px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}.lc b{display:block;color:var(--g)}.lc ul{margin:4px 0 0;padding-left:16px}
+@media(max-width:900px){.lc{grid-template-columns:1fr}.lc>div{grid-column:auto!important}}
+svg.diagram{width:100%;height:auto;display:block}
+svg.diagram text{fill:var(--ink);font-family:inherit}
+svg.diagram .sub{fill:var(--mute)}
+.ab{fill:var(--card);stroke:var(--line);stroke-width:1.5}.ag{fill:var(--gl);stroke:var(--g);stroke-width:1.5}.co{fill:var(--yl);stroke:var(--y);stroke-width:2}
+.ln{stroke:var(--mute);stroke-width:1.5;fill:none}
+.rt{stroke:var(--g);stroke-width:3;fill:none;stroke-linecap:round}.rt.d{stroke-dasharray:6 6;stroke:var(--mute)}
+.node{fill:var(--g)}.node.y{fill:var(--y)}
+.calc label{display:flex;justify-content:space-between;font-weight:700}
+.calc label output{color:var(--g)}
+footer{border-top:1px solid var(--line);padding:20px 0;color:var(--mute);font-size:.86rem}
+:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.tabs,aside{display:none}section{display:block!important}}
+</style></head><body>
+<header><div class="w">
+<div style="display:flex; align-items:center; gap:12px;"><a class="logo" href="#home">Food<b>Loop</b> AI</a><span style="font-size:0.85rem; font-weight:bold; color:var(--g); background:var(--gl); padding:4px 10px; border-radius:6px; white-space:nowrap;">by Mandar Mutey</span></div>
+<nav aria-label="Main"><a href="#home">Home</a><a href="#try">Try it</a><a href="#impact">Impact</a><a href="#about">About</a></nav></div></header>
+<main class="w">
+
+<!-- ============ HOME ============ -->
+<section id="home"><div class="hero"><div>
+<p>SDG 2: Zero Hunger</p><h1>Good food should reach a plate, not a bin.</h1>
+<p>FoodLoop AI is a team of agents that turns one WhatsApp message from a donor into a matched NGO, a booked pickup and proof of delivery, before the food spoils.</p>
+<a class="btn" href="#try">Try the demo</a> <a class="btn o" href="#about">How it is built</a></div>
+<div class="clock"><div class="small" style="color:#d5e8da">Safe window for cooked food (4 hours)</div><div class="big">3h 30m left</div>
+<div class="bar"><i style="width:87.5%"></i></div>
+<div class="marks"><span>Cooked 7:00 pm</span><span>Listed 7:30 pm</span><span>Safe until 11:00 pm</span></div>
+<p class="small" style="color:#d5e8da;margin-top:12px">Every agent works against this clock. If a step cannot finish inside it, the case goes to a human.</p></div></div>
+
+<div class="grid g4 stats" style="margin-top:18px">
+<div class="card"><div class="k">1</div><p class="small">WhatsApp message starts a rescue</p></div>
+<div class="card"><div class="k">4 hours</div><p class="small">safe window every agent works against</p></div>
+<div class="card"><div class="k">5 agents</div><p class="small">four specialists and one coordinator</p></div>
+<div class="card"><div class="k">Free</div><p class="small">for every NGO and receiver, always</p></div></div>
+
+<h2 class="sec">Surplus food exists. The path to a plate does not.</h2>
+<div class="grid g3">
+<div class="card"><h3>Surplus goes to waste</h3><p>Hostel messes, caterers and wedding halls have extra food but do not know who needs it right now.</p><p class="small"><b>FoodLoop:</b> one shared list of what is available, who needs it and how far away they are.</p></div>
+<div class="card"><h3>Time and logistics</h3><p>Cooked food is safe for only a few hours. Phone calls between donor, NGO and driver are too slow.</p><p class="small"><b>FoodLoop:</b> agents ask, match and book in parallel, and show the time left at every step.</p></div>
+<div class="card"><h3>No trust, no tracking</h3><p>Donors worry about safety and liability. Nobody counts the meals that were actually saved.</p><p class="small"><b>FoodLoop:</b> a hygiene checklist, delivery proof and a meals-saved report for the donor.</p></div></div>
+
+<h2 class="sec">How one rescue works</h2>
+<p>Times below are targets for a pilot, not measured results.</p>
+<ol class="flow">
+<li><h3>Donor sends a message</h3><p>One WhatsApp text: what is left, how much, when it was cooked.</p><span class="t">Under 1 minute</span></li>
+<li><h3>Listing is created</h3><p>The Donor agent reads the text and works out the safe-until time.</p><span class="t">Seconds</span></li>
+<li><h3>Best receiver is offered</h3><p>The Matcher ranks NGOs and sends the top offer, with reasons.</p><span class="t">Offer in 2 minutes</span></li>
+<li><h3>Pickup is booked</h3><p>Logistics picks the nearest volunteer and checks the delivery time.</p><span class="t">Confirmed in 10 minutes</span></li>
+<li><h3>Proof and report</h3><p>Safety and Impact checks hygiene, stores proof and counts meals.</p><span class="t">At handover</span></li></ol>
+
+<h2 class="sec">Five agents, one rescue desk</h2>
+<div class="grid g4">
+<div class="card step"><h3>Donor</h3><p>Reads the message and lists food, quantity and safe-until time.</p><p class="small"><b>Output:</b> a listing with a countdown.</p></div>
+<div class="card step"><h3>Matcher</h3><p>Ranks NGOs by need, distance, capacity and time left.</p><p class="small"><b>Output:</b> ranked receivers with reasons.</p></div>
+<div class="card step"><h3>Logistics</h3><p>Assigns the nearest volunteer and a pickup slot.</p><p class="small"><b>Output:</b> pickup and delivery times.</p></div>
+<div class="card step"><h3>Safety and Impact</h3><p>Checks hygiene, records proof, counts meals.</p><p class="small"><b>Output:</b> delivery receipt and report.</p></div></div>
+<div class="card warn" style="margin-top:14px"><b>Coordinator agent</b> keeps shared memory of donors, receivers and volunteers, and sends any unclear case to a human. It also writes the log you can see in the demo.</div>
+
+<h2 class="sec">Who it helps</h2>
+<div class="grid g3">
+<div class="card"><h3>Donors</h3><ul class="plain"><li>List surplus with one message</li><li>Get a delivery receipt for every batch</li><li>Get a meals-saved report for CSR and ESG</li></ul></div>
+<div class="card"><h3>NGOs and shelters</h3><ul class="plain"><li>See offers ranked by their own need</li><li>Know quantity and safe-until time before accepting</li><li>Never pay, never need a new app</li></ul></div>
+<div class="card"><h3>Volunteers and NSS units</h3><ul class="plain"><li>Get short pickup requests close to where they are</li><li>See exact times, no phone tag</li><li>Hours and meals delivered are recorded</li></ul></div></div>
+
+<h2 class="sec">Questions people ask</h2>
+<details><summary>Why a 4-hour safe window?</summary><p>It is a planning assumption for this concept project. A real pilot must follow local food-safety rules (in India, FSSAI guidance) and use the stricter limit for each type of food.</p></details>
+<details><summary>What if the donor's message is unclear?</summary><p>The Donor agent shows what it understood. If quantity or cooked time is missing, the Coordinator sends the case to a human instead of guessing. Try the "unclear message" sample in the demo.</p></details>
+<details><summary>What if a volunteer does not show up?</summary><p>The next volunteer is asked after 10 minutes. If the pickup still fails, a human coordinator takes over before the safe window ends.</p></details>
+<details><summary>Does this demo send real messages?</summary><p>No. Everything runs in your browser on sample NGOs, volunteers and numbers. Nothing is sent and no personal data is stored.</p></details>
+<details><summary>Who pays for it?</summary><p>NGOs never pay. Revenue comes from CSR sponsorship per meal, chain and caterer subscriptions, ESG reports, and college and municipal contracts.</p></details>
+
+<div class="cta" style="margin-top:26px"><div><h3>See a full rescue in under a minute</h3><p>Four tabs: read the message, match an NGO, book the pickup, record proof.</p></div><a class="btn" href="#try">Try the demo</a></div>
+</section>
+
+<!-- ============ TRY ============ -->
+<section id="try"><span class="tag">Demo workspace</span><h2>Rescue a batch of food</h2>
+<p>Follow the four tabs in order. Everything runs in your browser on sample data.</p>
+<div class="layout"><div><div class="tabs" role="tablist" aria-label="Rescue steps" id="tabs"></div><div id="panel" role="tabpanel"></div></div>
+<aside id="side" aria-label="Coordinator log"></aside></div></section>
+
+<!-- ============ IMPACT ============ -->
+<section id="impact"><span class="tag">SDG 2 and SDG 12.3</span><h2>Impact plan</h2>
+<p>Figures are planning assumptions to test in a pilot, not results.</p>
+<div class="grid g3"><div class="card"><h3>Target 2.1</h3><p>End hunger and give everyone safe, nutritious food. FoodLoop moves cooked food to people within hours.</p></div>
+<div class="card"><h3>Target 12.3</h3><p>Reduce food waste. Every rescued meal is one less meal in the bin.</p></div>
+<div class="card"><h3>Live counter</h3><div class="k" id="liveMeals">0</div><p class="small">meals rescued in this demo session</p></div></div>
+
+<div class="kpis" style="margin-top:14px">
+<div class="card"><div class="k" id="liveKg">0</div><p class="small">kg of food kept out of waste (0.4 kg per meal)</p></div>
+<div class="card"><div class="k" id="liveCo2">0</div><p class="small">kg CO2e avoided, illustrative factor of 2.5 per kg</p></div>
+<div class="card"><div class="k" id="liveBatches">0</div><p class="small">batches delivered with proof</p></div>
+<div class="card"><div class="k" id="liveNgo">0</div><p class="small">receivers served this session</p></div></div>
+
+<div class="card" style="margin-top:14px"><h3>Pilot funnel assumptions (one city, one month)</h3><div id="funnel"></div></div>
+
+<div class="card calc" style="margin-top:14px"><h3>Pilot calculator</h3><p class="small">Change the assumptions to see what a pilot would need. These are what-if numbers, not forecasts.</p>
+<div class="grid g2"><div>
+<label for="cL">Listings per month <output id="oL"></output></label><input id="cL" type="range" min="100" max="1000" step="50" value="500" oninput="calc()">
+<label for="cS">Listings that end with proof <output id="oS"></output></label><input id="cS" type="range" min="40" max="95" step="5" value="70" oninput="calc()">
+<label for="cM">Average meals per delivery <output id="oM"></output></label><input id="cM" type="range" min="10" max="150" step="5" value="30" oninput="calc()">
+<label for="cN">Receiving NGOs <output id="oN"></output></label><input id="cN" type="range" min="1" max="6" step="1" value="2" oninput="calc()">
+<label for="cC">Meals each NGO can take per day <output id="oC"></output></label><input id="cC" type="range" min="50" max="400" step="10" value="200" oninput="calc()"></div>
+<div><table><tr><th>Result</th><th>Value</th></tr>
+<tr><td>Deliveries with proof per month</td><td id="rD"></td></tr>
+<tr><td>Meals rescued per month</td><td id="rM"></td></tr>
+<tr><td>Meals in one 4-month semester</td><td id="rSem"></td></tr>
+<tr><td>Food kept out of waste per month</td><td id="rKg"></td></tr>
+<tr><td>Meals per NGO per day</td><td id="rPer"></td></tr></table>
+<p id="rFlag" style="margin-top:10px"></p>
+<div id="ramp"></div></div></div></div>
+
+<div class="card" style="margin-top:14px"><h3>Metrics we would track</h3><table><tr><th>Metric</th><th>Why it matters</th><th>How we would measure it</th><th>Pilot target to test</th></tr>
+<tr><td>Meals rescued per month</td><td>The outcome that matters for SDG 2.</td><td>Count from signed delivery proofs</td><td>Set by the calculator above</td></tr>
+<tr><td>Listing-to-pickup time</td><td>Shows we beat the food-safe window.</td><td>Time stamps from the Coordinator log</td><td>Under 45 minutes</td></tr>
+<tr><td>Pickup success rate</td><td>Shows matches are real, not just offers.</td><td>Pickups completed divided by offers accepted</td><td>At least 85%</td></tr>
+<tr><td>Repeat-donor rate</td><td>Shows donors trust the service.</td><td>Donors with a second listing within 30 days</td><td>At least 60%</td></tr>
+<tr><td>Food-safety incidents</td><td>Target is zero.</td><td>Receiver reports and checklist audits</td><td>Zero</td></tr></table></div>
+
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>Pilot design</h3><p>Run for one semester with hostel messes and two NGOs in one Tier-2 city. Compare meals reaching NGOs against the previous semester. Publish the results.</p>
+<ul class="plain"><li>Weeks 1 to 2: onboard two NGOs, three messes, five volunteers</li><li>Weeks 3 to 6: Donor and Matcher agents live, calls as backup</li><li>Weeks 7 to 14: add Logistics and Safety agents</li><li>Weeks 15 to 18: collect results and publish</li></ul></div>
+<div class="card"><h3>How we will know it worked</h3><ul class="plain"><li>More meals reach NGOs than in the previous semester</li><li>Most food is delivered with more than 30 minutes of safe time left</li><li>Donors list again without being reminded</li><li>No food-safety incident in the whole pilot</li></ul><p class="small" style="margin-top:8px">If these are not met, we publish that too and change the design.</p></div></div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about"><span class="tag">About the project</span><h2>How FoodLoop AI is built</h2>
+<p>A student concept project by <b>Mandar Mutey</b> for IBM SkillsBuild for Academia, Masterclass 5, on SDG 2.</p>
+<h3>Lean Canvas</h3>
+<div class="lc">
+<div><b>1 Problem</b><ul><li>Surplus goes to waste</li><li>Time and logistics</li><li>No trust or tracking</li></ul><b style="margin-top:8px">Alternatives</b><ul><li>Phone calls, WhatsApp groups</li><li>Food-rescue NGOs</li></ul></div>
+<div><b>4 Solution</b><ul><li>Donor, Matcher, Logistics, Safety and Impact agents</li></ul><b style="margin-top:8px">8 Key metrics</b><ul><li>Meals rescued</li><li>Listing-to-pickup time</li></ul></div>
+<div><b>3 Value proposition</b>Rescue surplus food with one WhatsApp message.<b style="margin-top:8px">Concept</b>Uber for surplus food, run by AI agents, for NGOs.</div>
+<div><b>5 Unfair advantage</b><ul><li>Matching inside the safe window</li><li>NGO and volunteer network</li><li>Impact data for CSR</li></ul><b style="margin-top:8px">9 Channels</b><ul><li>WhatsApp, web, SMS</li><li>NSS units, caterer groups</li></ul></div>
+<div><b>2 Customers</b><ul><li>Donors: messes, caterers, halls</li><li>Receivers (free): NGOs, shelters</li><li>Payers: CSR, colleges, municipal</li></ul><b style="margin-top:8px">Early adopters</b><ul><li>Hostels, NSS units</li></ul></div>
+<div style="grid-column:span 2"><b>7 Cost structure</b>LLM and hosting, maps, WhatsApp API, team, food-safety training, marketing</div>
+<div style="grid-column:span 3;border-right:0"><b>6 Revenue streams</b>Free plan for small donors · chain and caterer subscriptions · CSR sponsorship per meal · ESG reports · college and municipal contracts. NGOs never pay.</div></div>
+
+<h3 class="sec">Architecture</h3>
+<div class="card"><svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="Architecture: channels feed a coordinator, which routes to four agents, which use shared data">
+<text x="12" y="22" font-size="13" class="sub">Channels</text>
+<rect class="ab" x="12" y="30" width="280" height="44" rx="10"/><text x="152" y="57" font-size="14" text-anchor="middle">WhatsApp bot</text>
+<rect class="ab" x="310" y="30" width="280" height="44" rx="10"/><text x="450" y="57" font-size="14" text-anchor="middle">Web dashboard</text>
+<rect class="ab" x="608" y="30" width="280" height="44" rx="10"/><text x="748" y="57" font-size="14" text-anchor="middle">SMS fallback</text>
+<path class="ln" d="M152 74V104M450 74V104M748 74V104"/>
+<rect class="co" x="12" y="104" width="876" height="62" rx="12"/>
+<text x="450" y="130" font-size="16" font-weight="700" text-anchor="middle">Coordinator agent</text>
+<text x="450" y="152" font-size="13" text-anchor="middle" class="sub">Routes each request, keeps shared memory, writes the log, sends unclear or failed cases to a human</text>
+<path class="ln" d="M122 166V196M341 166V196M559 166V196M778 166V196"/>
+<rect class="ag" x="12" y="196" width="220" height="86" rx="12"/><text x="122" y="222" font-size="15" font-weight="700" text-anchor="middle">Donor</text><text x="122" y="244" font-size="12.5" text-anchor="middle" class="sub">Reads message</text><text x="122" y="262" font-size="12.5" text-anchor="middle" class="sub">Builds listing</text>
+<rect class="ag" x="231" y="196" width="220" height="86" rx="12"/><text x="341" y="222" font-size="15" font-weight="700" text-anchor="middle">Matcher</text><text x="341" y="244" font-size="12.5" text-anchor="middle" class="sub">Scores receivers</text><text x="341" y="262" font-size="12.5" text-anchor="middle" class="sub">Shows reasons</text>
+<rect class="ag" x="449" y="196" width="220" height="86" rx="12"/><text x="559" y="222" font-size="15" font-weight="700" text-anchor="middle">Logistics</text><text x="559" y="244" font-size="12.5" text-anchor="middle" class="sub">Picks volunteer</text><text x="559" y="262" font-size="12.5" text-anchor="middle" class="sub">Checks delivery time</text>
+<rect class="ag" x="668" y="196" width="220" height="86" rx="12"/><text x="778" y="222" font-size="15" font-weight="700" text-anchor="middle">Safety and Impact</text><text x="778" y="244" font-size="12.5" text-anchor="middle" class="sub">Checklist and proof</text><text x="778" y="262" font-size="12.5" text-anchor="middle" class="sub">Counts meals</text>
+<path class="ln" d="M122 282V310M341 282V310M559 282V310M778 282V310"/>
+<rect class="ab" x="12" y="310" width="876" height="44" rx="10"/><text x="450" y="337" font-size="14" text-anchor="middle">Data: donors, receivers, volunteers, maps and routing, delivery proof</text>
+</svg></div>
+
+<h3 class="sec">What each agent does</h3>
+<div class="card" style="overflow-x:auto"><table><tr><th>Agent</th><th>Reads</th><th>Does</th><th>Tools</th><th>If it fails</th></tr>
+<tr><td><b>Donor</b></td><td>WhatsApp text</td><td>Extracts food, quantity, cooked time and area. Works out the safe-until time.</td><td>Language model, time rules</td><td>Asks the donor one question, then a human</td></tr>
+<tr><td><b>Matcher</b></td><td>Listing and receiver profiles</td><td>Scores receivers: need 35%, distance 30%, capacity 20%, arrives in time 15%. Shows reasons.</td><td>Receiver data, distance</td><td>Offers the next receiver after 10 minutes</td></tr>
+<tr><td><b>Logistics</b></td><td>Accepted offer, volunteer list</td><td>Picks the nearest volunteer, books pickup, checks delivery is inside the safe window.</td><td>Maps and routing, messaging</td><td>Asks the next volunteer, then a human</td></tr>
+<tr><td><b>Safety and Impact</b></td><td>Checklist, receiver sign-off</td><td>Blocks handover until the checklist is complete. Stores proof and counts meals.</td><td>Checklist, proof storage</td><td>Pauses the donor and escalates the incident</td></tr>
+<tr><td><b>Coordinator</b></td><td>Every agent event</td><td>Routes requests, keeps shared memory and the audit log, handles escalations.</td><td>Memory store</td><td>A human is always the last step</td></tr></table></div>
+
+<div class="grid g2 sec">
+<div class="card"><h3>What is real in this demo</h3><ul class="plain"><li>Message reading, using simple pattern rules</li><li>Ranking with the formula shown on screen</li><li>Safe-time check and expired-food block</li><li>Volunteer choice and delivery times</li><li>Meal counting and the downloadable receipt</li></ul></div>
+<div class="card"><h3>What is simulated</h3><ul class="plain"><li>NGO acceptance and volunteer replies</li><li>WhatsApp sending: no messages are sent</li><li>Photo proof and signature</li><li>NGOs, volunteers and areas are sample data</li></ul><p class="small" style="margin-top:8px">In the planned product, a language model would read the message and return the same fields.</p></div></div>
+
+<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Safety and privacy</h3><p>Cooked food with a time stamp only. Hygiene checklist and delivery proof. Collect only what is needed, with consent. Every match shows its reasons.</p></div>
+<div class="card"><h3>Human in the loop</h3><p>A person is asked when the message is unclear, the safe window has passed, no volunteer confirms, or a safety incident is reported. Agents never guess on food safety.</p></div></div>
+
+<h3 class="sec">Risks and how the design handles them</h3>
+<div class="card" style="overflow-x:auto"><table><tr><th>Risk</th><th>What could go wrong</th><th>How we handle it</th></tr>
+<tr><td><b>Food safety</b></td><td>Spoiled food reaches people</td><td>Fresh, time-stamped cooked food only. 4-hour clock. Checklist before handover. Target of zero incidents. A real pilot follows local rules.</td></tr>
+<tr><td><b>Misread message</b></td><td>Wrong quantity or cooked time</td><td>Fields are shown for confirmation. Missing fields go to a human.</td></tr>
+<tr><td><b>Volunteer no-show</b></td><td>Pickup fails</td><td>10-minute confirmation, backup volunteers, human coordinator.</td></tr>
+<tr><td><b>NGO overload</b></td><td>More food than a receiver can take</td><td>Capacity is part of the score. Large batches can be split.</td></tr>
+<tr><td><b>Privacy</b></td><td>Too much personal data kept</td><td>Collect only what is needed, with consent. Demo uses sample data only.</td></tr>
+<tr><td><b>Donor liability worry</b></td><td>Donors hold back</td><td>Delivery receipt for each batch. Check local food-donation rules with a legal adviser before the pilot.</td></tr></table></div>
+
+<h3 class="sec">Roadmap</h3>
+<div class="grid g3"><div class="card"><b>Phase 1: Pilot</b><p>WhatsApp bot with Donor and Matcher agents in one city.</p><p class="small"><b>Done when:</b> the first 100 listings are handled with zero safety incidents.</p></div><div class="card"><b>Phase 2: Grow</b><p>Add Logistics and Safety agents. Onboard caterers and volunteers.</p><p class="small"><b>Done when:</b> most accepted offers end in a delivery with proof.</p></div><div class="card"><b>Phase 3: Prove impact</b><p>Publish meals-rescued results. Win CSR and government support.</p><p class="small"><b>Done when:</b> a public report compares results with the previous semester.</p></div></div>
+</section>
+</main>
+<footer><div class="w">FoodLoop AI · Student concept project by <span id="author">Mandar Mutey</span> · IBM SkillsBuild for Academia, Masterclass 5 · SDG 2<br>Sample NGOs, volunteers and numbers only. No real personal data is used.</div></footer>
+
+<script>
+const SAFE=240,KG=0.4,CO2=2.5;
+const AREAS=['College hostel mess','Station Road caterer','Camp wedding hall'];
+const AKEY=['college hostel','station road','camp wedding'];
+const SAMPLES=[
+{label:'Hostel mess: biryani and raita',msg:'Hi, 120 plates of veg biryani and raita left after dinner, cooked at 7:00 pm. College hostel mess.',now:'20:30'},
+{label:'Wedding hall: pulao by weight',msg:'Function over. About 25 kg pulao and paneer curry left, cooked at 8:00 pm. Camp wedding hall.',now:'21:15'},
+{label:'Caterer: dal and rice, too late',msg:'Hello, 50 plates dal and rice left, cooked at 2:00 pm. Station Road caterer.',now:'20:30'},
+{label:'Unclear message',msg:'Hi, we have some leftover food. Can someone pick it up? College hostel mess.',now:'20:30'}];
+const NGOS=[
+{n:'Annapurna Community Kitchen',t:'Community kitchen',need:85,cap:150,d:[1.4,3.8,5.2]},
+{n:'Asha Night Shelter',t:'Shelter',need:95,cap:80,d:[2.9,1.6,4.4]},
+{n:'Seva Old-Age Home',t:'Old-age home',need:60,cap:60,d:[4.1,2.2,3.0]},
+{n:'Bal Vikas Orphanage',t:'Orphanage',need:70,cap:100,d:[3.3,4.5,1.8]},
+{n:'Roti Bank',t:'Community kitchen',need:75,cap:200,d:[6.0,5.1,6.2]}];
+const VOLS=[{n:'Rohan (NSS unit)',d:[0.8,3.1,4.9]},{n:'Priya (volunteer)',d:[2.5,0.9,3.7]},{n:'Imran (driver)',d:[1.9,2.4,1.2]}];
+const CHECKS=['Food was cooked today and is time-stamped','Stored covered, in clean containers','No leftovers from plates (fresh surplus only)'];
+const S={tab:0,sample:0,msg:SAMPLES[0].msg,food:'',qty:120,cooked:'19:00',now:'20:30',area:0,found:{},human:false,escalated:false,listed:false,ranked:null,pick:null,checks:[0,0,0],receiver:'Kitchen in-charge (sample)',photo:false,done:false,total:0,batches:0,ngos:[],log:[],lt:0};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mins=t=>{const[a,b]=t.split(':').map(Number);return a*60+b};
+const hhmm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const fmt=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=String(m%60).padStart(2,'0'),ap=h>=12?'pm':'am';return((h+11)%12+1)+':'+mm+' '+ap};
+const f1=n=>(Math.round(n*10)/10).toFixed(1);
+const left=()=>mins(S.cooked)+SAFE-mins(S.now);
+const hm=m=>m<=0?'Expired':Math.floor(m/60)+'h '+m%60+'m';
+const num=n=>Math.round(n).toLocaleString('en-IN');
+function L(a,x,t){if(t!==undefined)S.lt=t;else S.lt+=1;S.log.push({t:S.lt,a,x})}
+function reset(){S.ranked=null;S.pick=null;S.checks=[0,0,0];S.photo=false;S.done=false;S.escalated=false}
+function parse(){
+ const m=S.msg,f={food:false,qty:false,cooked:false,area:false};
+ S.lt=mins(S.now)-1;
+ const q=m.match(/(\d+)\s*(plates?|meals?|portions?|people|kg)/i);
+ if(q){S.qty=q[2].toLowerCase()==='kg'?Math.round(q[1]*4):+q[1];f.qty=true}else S.qty=50;
+ const t=m.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+ if(t){let h=+t[1]%12;if(t[3].toLowerCase()==='pm')h+=12;S.cooked=String(h).padStart(2,'0')+':'+(t[2]||'00');f.cooked=true}else S.cooked=hhmm(mins(S.now)-30);
+ const fd=m.match(/\b(biryani|pulao|rice|dal|roti|sabzi|curry|paneer|khichdi|pav bhaji)\b/ig);
+ if(fd){S.food=[...new Set(fd.map(x=>x[0].toUpperCase()+x.slice(1).toLowerCase()))].join(', ');f.food=true}else S.food='Cooked food';
+ const lm=m.toLowerCase();AKEY.forEach((a,i)=>{if(lm.includes(a)){S.area=i;f.area=true}});
+ S.found=f;S.human=!(f.qty&&f.cooked);S.listed=true;reset();
+ L('Donor',S.human?'Message unclear. Could not read '+[!f.qty&&'quantity',!f.cooked&&'cooked time'].filter(Boolean).join(' or ')+'.':'Read message: '+S.qty+' meals of '+S.food+', cooked '+fmt(mins(S.cooked))+'.');
+ L('Coordinator',S.human?'Sent to a human coordinator to confirm the details.':'Saved listing for '+AREAS[S.area]+' to shared memory.');
+ if(!S.human&&left()<=0)L('Safety and Impact','Safe window has passed. Listing blocked.');
+}
+function loadSample(i){i=+i;if(i<0)return;S.sample=i;S.msg=SAMPLES[i].msg;S.now=SAMPLES[i].now;S.tab=0;parse();render()}
+function edit(k,v){
+ if(k==='qty')S.qty=Math.max(1,+v||1);if(k==='cooked'&&v)S.cooked=v;if(k==='food')S.food=v||S.food;if(k==='area')S.area=+v;
+ S.found[k]=true;S.human=!(S.found.qty&&S.found.cooked);S.lt=Math.max(S.lt,mins(S.now));reset();
+ L('Donor','Human confirmed '+(k==='cooked'?'cooked time':k)+'.');if(!S.human)L('Coordinator','Details confirmed. Listing is ready.');render()}
+function setNow(v){if(!v)return;S.now=v;reset();render()}
+function escalate(){S.escalated=true;L('Coordinator','Notified a human coordinator. Food must not be collected.');render()}
+function rank(){const r=left();
+ S.ranked=NGOS.map(o=>{const d=o.d[S.area],tr=Math.round(d*4+10),ok=tr+20<=r,capf=Math.min(1,o.cap/S.qty),ds=Math.max(0,1-d/8);
+  const parts={need:o.need*.35,dist:ds*100*.3,cap:capf*100*.2,time:ok?15:0};
+  const sc=Math.round(parts.need+parts.dist+parts.cap+parts.time);
+  return{...o,d,tr,ok,sc,parts,why:['Need '+o.need+'/100',d+' km away',(o.cap>=S.qty?'Can take all '+S.qty:'Can take '+o.cap+' of '+S.qty),ok?'Arrives in time':'Too slow for safe window']}}).sort((a,b)=>b.sc-a.sc);
+ L('Matcher','Ranked '+S.ranked.length+' receivers. Best match: '+S.ranked[0].n+' ('+S.ranked[0].sc+').')}
+function plan(){const o=S.ranked[S.pick];const vs=VOLS.map(v=>({...v,k:v.d[S.area]})).sort((a,b)=>a.k-b.k);const v=vs[0];
+ const pick=mins(S.now)+Math.round(v.k*4+5),arr=pick+o.tr,safe=mins(S.cooked)+SAFE;return{o,vs,v,pick,arr,safe,buf:safe-arr}}
+function sendOffer(){S.pick=0;const p=plan();
+ L('Matcher','Offer sent to '+p.o.n+'.');L('Coordinator',p.o.n+' accepted (simulated reply).');
+ L('Logistics','Assigned '+p.v.n+', '+p.v.k+' km from the donor. Pickup at '+fmt(p.pick)+'.',mins(S.now)+4);
+ L('Logistics','Delivery planned for '+fmt(p.arr)+'. '+(p.buf>=0?'Inside the safe window.':'Too late. Escalated.'));S.tab=2;render()}
+function confirmDelivery(){const p=plan();S.done=true;S.total+=S.qty;S.batches++;if(!S.ngos.includes(p.o.n))S.ngos.push(p.o.n);
+ L('Safety and Impact','Checklist complete. Receiver signed off. Photo proof stored.',p.arr);
+ L('Safety and Impact','Delivery recorded. +'+S.qty+' meals, session total '+S.total+'.');render()}
+function newBatch(){S.tab=0;S.listed=false;S.msg='';S.sample=-1;reset();S.human=false;S.found={};render()}
+function receipt(){const p=plan(),id='FL-'+String(S.batches).padStart(4,'0');
+ return{id,txt:['FOODLOOP AI DELIVERY RECEIPT (SAMPLE DATA)','Receipt: '+id,'Donor: '+AREAS[S.area],'Food: '+S.food,'Meals: '+S.qty,'Cooked at: '+fmt(mins(S.cooked)),'Safe until: '+fmt(p.safe),'Picked up by: '+p.v.n+' at '+fmt(p.pick),'Delivered to: '+p.o.n+' at '+fmt(p.arr),'Received by: '+S.receiver,'Hygiene checklist: 3 of 3 complete','Photo proof: attached (simulated)','Food kept out of waste: about '+Math.round(S.qty*KG)+' kg'].join('\n')}}
+function download(){const r=receipt(),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.txt],{type:'text/plain'}));a.download=r.id+'.txt';a.click();URL.revokeObjectURL(a.href)}
+
+function tabs(){const n=['1 Donor','2 Matcher','3 Logistics','4 Safety and Impact'];$('tabs').innerHTML=n.map((x,i)=>`<button role="tab" aria-selected="${S.tab===i}" class="${S.tab===i?'on':''}" onclick="S.tab=${i};render()">${x}</button>`).join('')}
+function status(k){return S.found[k]?'<span class="tag">Found in message</span>':'<span class="tag y">Assumed, please check</span>'}
+function donor(){const r=left(),su=mins(S.cooked)+SAFE,blocked=S.human||r<=0;
+return`<div class="grid g2"><div class="card"><h3>Donor Agent</h3><p class="small">Paste what a donor would send on WhatsApp.</p>
+<label for="sample">Try a sample message</label>
+<select id="sample" onchange="loadSample(this.value)">${SAMPLES.map((s,i)=>`<option value="${i}" ${S.sample===i?'selected':''}>${s.label}</option>`).join('')}<option value="-1" ${S.sample===-1?'selected':''}>Your own message</option></select>
+<label for="msg">Donor message</label><textarea id="msg" oninput="S.msg=this.value;S.sample=-1;$('sample').value=-1">${esc(S.msg)}</textarea>
+<p style="margin-top:10px"><button class="btn" onclick="parse();render()">Read message</button></p>
+<label for="now">Time now</label><input id="now" type="time" value="${S.now}" onchange="setNow(this.value)"></div>
+<div>${S.listed?`<div class="chat"><div class="h">FoodLoop AI</div><div class="b"><div class="m me">${esc(S.msg)}</div>${S.human?`<div class="m">I could not read the ${[!S.found.qty&&'quantity',!S.found.cooked&&'cooked time'].filter(Boolean).join(' or ')}. A coordinator will confirm with you. Please do not move the food yet.</div>`:`<div class="m">Got it. Listing created: ${S.qty} meals of ${esc(S.food)}. Safe until ${fmt(su)}. Finding the best NGO now.</div>`}</div></div>
+<div class="card ${S.human||r<=0?'bad':'step'}" style="margin-top:12px"><h3>Listing</h3><span class="tag">${esc(S.food)}</span><span class="tag">${S.qty} meals</span><span class="tag">${AREAS[S.area]}</span><br><span class="tag">Cooked ${fmt(mins(S.cooked))}</span><span class="tag ${r<60?'r':'y'}">Safe until ${fmt(su)}</span><span class="tag ${r<=0?'r':''}">Time left ${hm(r)}</span>${S.human?'<p style="color:var(--r)"><b>Needs a human.</b> Confirm the quantity and cooked time below before matching.</p>':r<=0?`<p style="color:var(--r)"><b>Too late to rescue.</b> The safe window has passed. Do not collect this food.</p><p>${S.escalated?'<span class="tag">Human coordinator notified</span>':'<button class="btn s" onclick="escalate()">Notify a human coordinator</button>'}</p>`:'<p><button class="btn" onclick="rank();S.tab=1;render()">Find a receiver</button></p>'}</div>`:'<div class="card warn">Paste a message and press Read message.</div>'}</div></div>
+${S.listed?`<div class="card" style="margin-top:14px"><div class="row"><h3>What the agent understood</h3><span class="small">Edit any field. Missing quantity or time must be confirmed.</span></div>
+<div class="fields"><div><label for="fFood">Food</label><input id="fFood" value="${esc(S.food)}" onchange="edit('food',this.value)">${status('food')}</div>
+<div><label for="fQty">Meals</label><input id="fQty" type="number" min="1" value="${S.qty}" onchange="edit('qty',this.value)">${status('qty')}</div>
+<div><label for="fCooked">Cooked at</label><input id="fCooked" type="time" value="${S.cooked}" onchange="edit('cooked',this.value)">${status('cooked')}</div>
+<div><label for="fArea">Pickup area</label><select id="fArea" onchange="edit('area',this.value)">${AREAS.map((a,i)=>`<option value="${i}" ${S.area===i?'selected':''}>${a}</option>`).join('')}</select>${status('area')}</div></div></div>`:''}`}
+function matcher(){if(!S.listed||S.human)return`<div class="card warn">Create a confirmed listing in the Donor tab first.</div>`;
+if(left()<=0)return`<div class="card bad"><h3>Nothing to match</h3><p>The safe window has passed, so no receiver is offered this food. Go back to the Donor tab.</p></div>`;
+if(!S.ranked)rank();const top=S.ranked[0],rem=S.qty-top.cap,sec=S.ranked.find((x,i)=>i>0&&x.ok);
+return`<div class="card"><div class="row"><h3>Matcher Agent: ranked receivers</h3><span class="tag y">Time left ${hm(left())}</span></div><p class="small">Score = need 35%, distance 30%, capacity 20%, arrives in time 15%. Every match shows its reasons.</p>
+<div class="legend"><span><i style="background:var(--c1)"></i>Need</span><span><i style="background:var(--c2)"></i>Distance</span><span><i style="background:var(--c3)"></i>Capacity</span><span><i style="background:var(--c4)"></i>Arrives in time</span></div>
+${S.ranked.map((o,i)=>`<div class="ngo"><div class="row"><div><b>${i+1}.${o.n}</b> <span class="small">${o.t}</span></div><div class="sc">${o.sc}</div></div>
+<div class="stack" role="img" aria-label="Score parts for ${o.n}"><i style="width:${o.parts.need}%;background:var(--c1)"></i><i style="width:${o.parts.dist}%;background:var(--c2)"></i><i style="width:${o.parts.cap}%;background:var(--c3)"></i><i style="width:${o.parts.time}%;background:var(--c4)"></i></div>
+${o.why.map((w,j)=>`<span class="tag ${j===3&&!o.ok?'r':''}">${w}</span>`).join('')}
+<div class="small">Score parts: need ${f1(o.parts.need)}, distance ${f1(o.parts.dist)}, capacity${f1(o.parts.cap)}, time ${f1(o.parts.time)}</div>${i===0&&S.pick===null?`<div style="margin-top:6px"><button class="btn" onclick="sendOffer()">Send offer to ${o.n}</button></div>`:''}${S.pick===i?'<span class="tag">Offer accepted</span>':''}</div>`).join('')}</div>
+${rem>0&&sec?`<div class="card warn" style="margin-top:14px"><b>Suggested split.</b> ${top.n} can take ${top.cap} of${S.qty} meals. The remaining ${rem} meals could go to${sec.n}, which also arrives in time.</div>`:''}`}
+function routeSvg(p){const k1=p.v.k,k2=p.o.d[S.area];
+return`<svg class="diagram" viewBox="0 0 520 150" role="img" aria-label="Route: volunteer to donor to receiver"><path class="rt d" d="M50 105Q150 105 260 55"/><path class="rt" d="M260 55Q380 105 470 105"/>
+<circle class="node y" cx="50" cy="105" r="10"/><circle class="node" cx="260" cy="55" r="10"/><circle class="node" cx="470" cy="105" r="10"/>
+<text x="50" y="132" font-size="12" text-anchor="middle">${p.v.n.split(' ')[0]}</text><text x="260" y="34" font-size="12" text-anchor="middle">Donor</text><text x="470" y="132" font-size="12" text-anchor="middle">${p.o.n.split(' ')[0]}</text>
+<text x="135" y="72" font-size="12" class="sub" text-anchor="middle">${k1} km</text><text x="375" y="72" font-size="12" class="sub" text-anchor="middle">${k2} km</text></svg>`}
+function logistics(){if(S.pick===null)return`<div class="card warn">Send an offer in the Matcher tab first.</div>`;
+const p=plan(),{o,vs,v,pick,arr,safe,buf}=p,el=mins(S.now)-mins(S.cooked),w=[el,pick-mins(S.now),arr-pick,Math.max(0,buf)].map(x=>Math.max(0,x)/SAFE*100);
+return`<div class="grid g2"><div class="card step"><h3>Logistics Agent</h3><p>Nearest volunteer: <b>${v.n}</b>, ${v.k} km from the donor.</p>
+<table><tr><th>Step</th><th>Time</th></tr><tr><td>Volunteer reaches ${AREAS[S.area]}</td><td>${fmt(pick)}</td></tr><tr><td>Delivery at ${o.n}</td><td>${fmt(arr)}</td></tr><tr><td>Food safe until</td><td>${fmt(safe)}</td></tr></table>
+<div class="seg" role="img" aria-label="Safe window split into waiting, pickup, delivery and spare time"><i style="width:${w[0]}%;background:var(--c4)"></i><i style="width:${w[1]}%;background:var(--c3)"></i><i style="width:${w[2]}%;background:var(--c1)"></i><i style="width:${w[3]}%;background:var(--gl)"></i></div>
+<div class="legend"><span><i style="background:var(--c4)"></i>Waiting ${el} min</span><span><i style="background:var(--c3)"></i>Volunteer travels ${pick-mins(S.now)} min</span><span><i style="background:var(--c1)"></i>Delivery ${arr-pick} min</span><span><i style="background:var(--gl);border:1px solid var(--line)"></i>Spare ${Math.max(0,buf)} min</span></div>
+<p style="margin-top:6px"><span class="tag ${buf>=0?'':'r'}">${buf>=0?'Delivery inside safe window':'Too late, escalate to human'}</span>${buf>=0?`<span class="tag">${hm(buf)} to spare</span>`:''}</p></div>
+<div><div class="card"><h3>Route</h3>${routeSvg(p)}</div>
+<div class="card" style="margin-top:14px"><h3>Backup volunteers</h3><table>${vs.slice(1).map(x=>`<tr><td>${x.n}</td><td>${x.k} km</td></tr>`).join('')}</table><p class="small">If the first volunteer does not confirm in 10 minutes, the next one is asked. A failed pickup goes to a human coordinator.</p>
+<button class="btn" onclick="S.tab=3;render()">Go to delivery</button></div></div></div>
+<div class="card" style="margin-top:14px"><div class="row"><h3>Pickup request to the volunteer</h3><span class="small">Sample message, not sent</span></div><div class="chat" style="max-width:520px;margin:6px 0 0"><div class="h">WhatsApp to ${v.n}</div><div class="b"><div class="m">Pickup request: ${S.qty} meals of ${esc(S.food)} at ${AREAS[S.area]}. Reach by ${fmt(pick)}. Deliver to ${o.n} by ${fmt(arr)}. Reply YES to accept.</div><div class="m me">YES</div></div></div></div>`}
+function safety(){if(S.pick===null)return`<div class="card warn">Complete matching and logistics first.</div>`;const p=plan(),o=p.o,all=S.checks.every(Boolean);
+return`<div class="grid g2"><div class="card"><h3>Safety and Impact Agent</h3><p class="small">Hygiene checklist before handover. The button stays off until every box is ticked.</p>
+${CHECKS.map((c,i)=>`<label style="font-weight:400"><input type="checkbox" style="width:auto" ${S.checks[i]?'checked':''}${S.done?'disabled':''} onchange="S.checks[${i}]=this.checked?1:0;render()"> ${c}</label>`).join('')}
+<label for="rcv">Received by</label><input id="rcv" value="${esc(S.receiver)}" ${S.done?'disabled':''} oninput="S.receiver=this.value">
+<label style="font-weight:400"><input type="checkbox" style="width:auto" ${S.photo?'checked':''} ${S.done?'disabled':''} onchange="S.photo=this.checked;render()"> Photo of handover attached (simulated)</label>
+<p style="margin-top:12px">${S.done?'<span class="tag">Delivered and recorded</span>':`<button class="btn" ${all?'':'disabled'} onclick="confirmDelivery()">Confirm delivery at ${o.n}</button>`}</p></div>
+<div class="card ${S.done?'step':''}"><h3>Delivery proof and report</h3>${S.done?`<p><b>${S.qty} meals</b> of${esc(S.food)} delivered to ${o.n} at${fmt(p.arr)}.</p><table><tr><td>Receipt</td><td>${receipt().id}</td></tr><tr><td>Picked up by</td><td>${p.v.n}</td></tr><tr><td>Received by</td><td>${esc(S.receiver)}</td></tr><tr><td>Checklist</td><td>3 of 3 complete</td></tr><tr><td>Photo proof</td><td>${S.photo?'Attached (simulated)':'Not attached'}</td></tr></table>
+<p style="margin-top:8px">Donor report: ${S.qty} meals rescued, about${Math.round(S.qty*KG)} kg of food kept out of waste. Photo proof and signature stored. Zero safety incidents.</p>
+<button class="btn s" onclick="download()">Download receipt</button> <button class="btn s o" onclick="newBatch()">Start another batch</button>`:'<p class="small">Confirm delivery to generate the proof and the meals-saved report.</p>'}</div></div>
+${S.done?`<div class="kpis" style="margin-top:14px"><div class="card"><div class="k">${S.qty}</div><p class="small">meals in this batch</p></div><div class="card"><div class="k">${Math.round(S.qty*KG)} kg</div><p class="small">kept out of waste</p></div><div class="card"><div class="k">${f1(S.qty*KG*CO2)} kg</div><p class="small">CO2e avoided (illustrative)</p></div><div class="card"><div class="k">${S.total}</div><p class="small">meals rescued this session</p></div></div>`:''}`}
+function side(){const tone=a=>a==='Coordinator'?'y':'';
+return`<div class="card"><h3>Coordinator log</h3><p class="small">Every agent writes here, so a human can see what happened and when.</p><ol class="log">${S.log.slice(-8).map(e=>`<li><span class="tm">${fmt(e.t)}</span><span class="tag ${tone(e.a)}">${e.a}</span>${esc(e.x)}</li>`).join('')}</ol></div>
+<div class="card" style="margin-top:14px"><div class="k">${S.total}</div><p class="small">meals rescued in ${S.batches} ${S.batches===1?'batch':'batches'} this session</p></div>`}
+function render(){tabs();$('panel').innerHTML=[donor,matcher,logistics,safety][S.tab]();$('side').innerHTML=side();$('liveMeals').textContent=S.total;$('liveKg').textContent=Math.round(S.total*KG);$('liveCo2').textContent=f1(S.total*KG*CO2);$('liveBatches').textContent=S.batches;$('liveNgo').textContent=S.ngos.length}
+function route(){const h=(location.hash||'#home').slice(1);document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===h));document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+h));scrollTo(0,0)}
+const F=[['Donor listings created',500],['Offers accepted by an NGO',410],['Pickups completed',360],['Deliveries with proof',350]];
+$('funnel').innerHTML=F.map((f,i)=>`<div class="row small" style="margin-top:8px"><span>${f[0]}</span><span><b>${f[1]}</b>${i?' ('+Math.round(f[1]/F[i-1][1]*100)+'% of the step before)':''}</span></div><div class="bar"><i style="width:${f[1]/5}%"></i></div>`).join('');
+function calc(){const g=id=>+$(id).value,L_=g('cL'),s=g('cS'),m=g('cM'),n=g('cN'),c=g('cC');$('oL').textContent=num(L_);$('oS').textContent=s+'\%';$('oM').textContent=m;$('oN').textContent=n;$('oC').textContent=c;
+ const del=L_*s/100,meals=del*m,per=meals/30/n;
+ $('rD').textContent=num(del);$('rM').textContent=num(meals);$('rSem').textContent=num(meals*4);$('rKg').textContent=num(meals*KG)+' kg';$('rPer').textContent=num(per);$('rFlag').innerHTML=per>c?`<span class="tag r">Over capacity</span> Each NGO would need to take ${num(per)} meals a day, above the ${c} you set. Add NGOs or list fewer batches.`:`<span class="tag">Within capacity</span> Each NGO takes about ${num(per)} meals a day, under the ${c} you set.`;
+ const ramp=[.2,.45,.7,.9,1],mx=Math.max(meals,1),bw=60,gap=34;
+ $('ramp').innerHTML=`<p class="small" style="margin:12px 0 4px">Meals per month over a 5-month pilot, assuming a slow ramp-up (20%, 45%, 70%, 90%, 100%).</p><svg class="diagram" viewBox="0 0 480 140" role="img" aria-label="Meals per month by pilot month">${ramp.map((r,i)=>{const h=Math.max(2,r*meals/mx*80),x=14+i*(bw+gap);return`<rect x="${x}" y="${100-h}" width="${bw}" height="${h}" rx="5" style="fill:var(--g)"/><text x="${x+bw/2}" y="${94-h}" font-size="12" text-anchor="middle">${num(r*meals)}</text><text x="${x+bw/2}" y="120" font-size="12" text-anchor="middle" class="sub">Month ${i+1}</text>`}).join('')}</svg>`}
+addEventListener('hashchange',route);route();parse();render();calc();
+</script></body></html>
